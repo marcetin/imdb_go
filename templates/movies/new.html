@@ -1,0 +1,6 @@
+<h1>New Movie</h1>
+
+<%= form_for(movie, {action: moviesPath(), method: "POST"}) { %>
+  <%= partial("movies/form.html") %>
+  <a href="<%= moviesPath() %>" class="btn btn-warning" data-confirm="Are you sure?">Cancel</a>
+<% } %>

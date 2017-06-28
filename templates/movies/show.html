@@ -1,0 +1,20 @@
+<h1>Movies#Show</h1>
+
+<ul class="list-unstyled list-inline">
+  <li><a href="<%= moviesPath() %>" class="btn btn-info">Back to all Movies</a></li>
+  <li><a href="<%= editMoviePath({ movie_id: movie.ID })%>" class="btn btn-warning">Edit</a></li>
+  <li><a href="<%= moviePath({ movie_id: movie.ID })%>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Destroy</a>
+</ul>
+
+<p>
+  <strong>Name</strong>: <%= movie.Name %>
+</p>
+<p>
+  <strong>Description</strong>: <%= movie.Description %>
+</p>
+<p>
+  <strong>Url</strong>: <%= movie.Url %>
+</p>
+<p>
+  <strong>Ratings</strong>: <%= movie.Ratings %>
+</p>

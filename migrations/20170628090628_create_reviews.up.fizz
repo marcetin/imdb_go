@@ -1,0 +1,8 @@
+create_table("reviews", func(t) {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("content", "string", {})
+  t.Column("title", "string", {})
+  t.Column("movie_id", "uuid", {})
+})
+
+add_index("reviews", "movie_id", {})
