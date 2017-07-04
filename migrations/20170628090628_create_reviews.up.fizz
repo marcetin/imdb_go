@@ -1,6 +1,6 @@
 create_table("reviews", func(t) {
 	t.Column("id", "uuid", {"primary": true})
-	t.Column("content", "string", {})
+	t.Column("content", "text", {})
   t.Column("title", "string", {})
   t.Column("movie_id", "uuid", {})
 })

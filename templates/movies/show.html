@@ -18,3 +18,18 @@
 <p>
   <strong>Ratings</strong>: <%= movie.Ratings %>
 </p>
+
+<p>
+<h3> Reviews </h3>
+<%= for (review) in reviews { %>
+  <div>
+    <p><strong><%= review.Title %></strong></p>
+    <p><%= review.Content %></p>
+  </div>
+<% } %>
+<%= form_for(review, {action: movieReviewsPath({ movie_id: movie.ID}), method: "POST"}) { %>
+  <%= f.InputTag("Title") %>
+  <%= f.TextArea("Content") %>
+  <button class="btn btn-success" role="submit">Save</button>
+<% } %>
+</p>

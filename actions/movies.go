@@ -54,8 +54,14 @@ func (v MoviesResource) Show(c buffalo.Context) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	reviews := &models.Reviews{}
+	tx.BelongsTo(movie).All(reviews)
+
 	// Make movie available inside the html template
 	c.Set("movie", movie)
+	c.Set("reviews", reviews)
+	c.Set("review", &models.Review{})
 	return c.Render(200, r.HTML("movies/show.html"))
 }
 
@@ -155,10 +161,7 @@ func (v MoviesResource) Update(c buffalo.Context) error {
 func (v MoviesResource) Destroy(c buffalo.Context) error {
 	// Get the DB connection from the context
 	tx := c.Value("tx").(*pop.Connection)
-	// Allocate an empty Movie
-	movie := &models.Movie{}
-	// To find the Movie the parameter movie_id is used.
-	err := tx.Find(movie, c.Param("movie_id"))
+	movie, err := find_movie(tx, c)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -172,19 +175,44 @@ func (v MoviesResource) Destroy(c buffalo.Context) error {
 	return c.Redirect(302, "/movies")
 }
 
-/*
-func (v MoviesResource) Reviews(c buffalo.Context) error {
+func ReviewsHandler(c buffalo.Context) error {
 	tx := c.Value("tx").(*pop.Connection)
 
-	review := models.Review{}
+	movie, err := find_movie(tx, c)
 
-	err := c.Bind(review)
+	review := &models.Review{}
+
+	err = c.Bind(review)
+	review.MovieID = movie.ID
+
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	verrs, errs := tx.ValidateAndCreate(review)
+	verrs, err := tx.ValidateAndCreate(review)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-}*/
+	if verrs.HasAny() {
+		// Make movie available inside the html template
+		c.Set("review", review)
+		// Make the errors available inside the html template
+		c.Set("errors", verrs)
+		// Render again the edit.html template that the user can
+		// correct the input.
+		return c.Render(422, r.HTML("movies/edit.html"))
+	}
+
+	return c.Redirect(302, "/movies/%s", movie.ID)
+}
+
+func find_movie(tx *pop.Connection, c buffalo.Context) (*models.Movie, error) {
+	// Allocate an empty Movie
+	movie := &models.Movie{}
+	// To find the Movie the parameter movie_id is used.
+	err := tx.Find(movie, c.Param("movie_id"))
+	if err != nil {
+		return movie, errors.WithStack(err)
+	}
+	return movie, nil
+}
